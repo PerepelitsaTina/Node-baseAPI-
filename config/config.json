@@ -1,8 +1,8 @@
 {
   "development": {
-    "username": "root",
+    "username": "postgres",
     "password": "fusion",
-    "database": "database_development",
+    "database": "baseAPI",
     "host": "localhost",
     "dialect": "postgres"
   },
