@@ -3,21 +3,21 @@
     "username": "postgres",
     "password": "fusion",
     "database": "baseAPI",
-    "host": "localhost",
+    "host": "127.0.0.1",
     "dialect": "postgres"
   },
   "test": {
     "username": "root",
-    "password": "fusion",
+    "password": null,
     "database": "database_test",
-    "host": "localhost",
+    "host": "127.0.0.1",
     "dialect": "postgres"
   },
   "production": {
     "username": "root",
-    "password": "fusion",
+    "password": null,
     "database": "database_production",
-    "host": "localhost",
+    "host": "127.0.0.1",
     "dialect": "postgres"
   }
 }
