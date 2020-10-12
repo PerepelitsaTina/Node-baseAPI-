@@ -12,7 +12,11 @@ module.exports = {
         type: Sequelize.STRING
       },
       email: {
-        isEmail: true,
+        validate: {
+          isEmail: {
+            msg: "Incorrect email"
+          }
+        },
         allowNull: false,
         unique: true,
         type: Sequelize.STRING
@@ -21,9 +25,16 @@ module.exports = {
         type: Sequelize.DATE
       },
       password: {
-        max: 20,
-        min: 3,
-        notContains: " ",
+        validate: {
+          len: {
+            args: [3, 20],
+            msg: "Min password length is 3, max is 20"
+          },
+          notContains: {
+            args: [" "],
+            msg: "Password can't contain spaces"
+          }
+        },
         allowNull: false,
         type: Sequelize.STRING
       },

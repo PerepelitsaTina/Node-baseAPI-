@@ -14,10 +14,50 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   User.init({
-    fullname: DataTypes.STRING,
-    email: DataTypes.STRING,
-    birthday: DataTypes.DATE,
-    password: DataTypes.STRING
+    id: {
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+      type: DataTypes.INTEGER
+    },
+    fullname: {
+      type: DataTypes.STRING
+    },
+    email: {
+      validate: {
+        isEmail: {
+          msg: "Incorrect email"
+        }
+      },
+      allowNull: false,
+      unique: true,
+      type: DataTypes.STRING
+    },
+    birthday: {
+      type: DataTypes.DATE
+    },
+    password: {
+      validate: {
+        len: {
+          args: [3, 20],
+          msg: "Min password length is 3, max is 20"
+        },
+        notContains: {
+          args: [" "],
+          msg: "Password can't contain spaces"
+        }
+      },
+      allowNull: false,
+      type: DataTypes.STRING
+    },
+    createdAt: {
+      allowNull: false,
+      type: DataTypes.DATE
+    },
+    updatedAt: {
+      allowNull: false,
+      type: DataTypes.DATE
+    }
   }, {
     sequelize,
     modelName: 'User',
