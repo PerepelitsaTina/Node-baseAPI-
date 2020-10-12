@@ -12,12 +12,19 @@ module.exports = {
         type: Sequelize.STRING
       },
       email: {
+        isEmail: true,
+        allowNull: false,
+        unique: true,
         type: Sequelize.STRING
       },
       birthday: {
         type: Sequelize.DATE
       },
       password: {
+        max: 20,
+        min: 3,
+        notContains: " ",
+        allowNull: false,
         type: Sequelize.STRING
       },
       createdAt: {

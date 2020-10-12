@@ -4,22 +4,7 @@ const db = require('../models/index');
 const router = express.Router();
 
 router.post("/register", async (req, res) => {
-  // if (!req.body) {
-  //  return res.status(400).json({
-  //    message: "Empty fields"
-  //   });
-  // };
   const { fullname, email, birthday, password } = req.body;
-  // const user = await db.User.findOne({
-  //   where: {
-  //     email
-  //   }
-  // });
-  // if (user) {
-  //  return res.json({
-  //     message: "This email is already registered"
-  //   });
-  // }
   try {
     await db.User.create({
       fullname,

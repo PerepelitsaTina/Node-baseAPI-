@@ -2,9 +2,9 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
 
-const urlencodedParser = bodyParser.urlencoded({ extended: false });
+const jsonParser = express.json();
 
-app.use(urlencodedParser);
+app.use(jsonParser);
 
 app.use("/auth", require("./routes/auth"));
 app.use("/user", require("./routes/user"));
