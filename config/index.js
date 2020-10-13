@@ -1,3 +1,5 @@
-const port = 3000;
+const defaultConfig = require('./defaultConfig.json');
 
-module.exports = port;
+const envType = process.env.NODE_ENV || 'development';
+
+module.exports = defaultConfig[envType];

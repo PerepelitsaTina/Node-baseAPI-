@@ -1,63 +1,72 @@
-const db = require('../models/index');
+const db = require("../models/index");
+const getErrorMessage = require("../utils/errorHandler");
+const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const { jwtSecret } = require("../config/app");
 
 const registration = async (req, res) => {
   try {
     const { email, password } = req.body;
-     const user = await db.User.create({
+    const user = await db.User.create({
       email,
       password
     });
-    res.json(user);
-  } catch (error) {
-    console.log(error);
-    const errorMessage = error.errors[0].message;
-    let comment;
-    let code;
-    switch (errorMessage) {
-      case "User.email cannot be null":
-        comment = "Put your email";
-        code = 400;
-        break
-      case "User.password cannot be null":
-        comment = "Put your password";
-        code = 400;
-        break
-      case "Validation isEmail on email failed":
-        comment = "Incorrect email";
-        code = 400;
-        break
-      case "Validation len on password failed":
-        comment = "Password min length is 3, max is 20";
-        code = 400;
-        break
-      case "Validation notContains on password failed":
-        comment = "Password can't contain spaces";
-        code = 400;
-        break
-      default:
-        comment = "Something is wrong. Try again";
-        code = 500;
+    const userWithoutPassword = {
+      fullname: user.fullname,
+      email: user.email,
+      birthday: user.birthday
     }
-    return res.status(code).json({ comment });
+    res.json(userWithoutPassword);
+  } catch (error) {
+    const errorMessage = getErrorMessage(error);
+    return res.status(errorMessage.code).json({ message: errorMessage.message });
   }
 };
+
+// const login = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+//     const user = await db.User.findOne({
+//       where: {
+//         email
+//       },
+//       attributes: {
+//         include: ["password"]
+//       }
+//     });
+//     if (!user) {
+//       return res.status(404).json({
+//         message: "This email is not registered"
+//       });
+//     }
+//     if (password !== user.password) {
+//       return res.status(400).json({
+//         message: "Password is wrong"
+//       })
+//     }
+//     const userWithoutPassword = {
+//       fullname: user.fullname,
+//       email: user.email,
+//       birthday: user.birthday
+//     }
+//     res.json(userWithoutPassword);
+//   }
+//   catch (err) {
+//     return res.status(500).json({
+//       message: "Something is wrong. Try again"
+//     })
+//   }
+// };
 
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email) {
-      return res.status(400).json({
-        message: "Put your email"
-      });
-    }
-    if (!password) {
-      return res.status(400).json({
-        message: "Put your password"
-      });
-    }
     const user = await db.User.findOne({
       where: {
         email
+      },
+      attributes: {
+        include: ["password"]
       }
     });
     if (!user) {
@@ -70,14 +79,22 @@ const login = async (req, res) => {
         message: "Password is wrong"
       })
     }
-    res.json(user);
-  } 
+    const token = jwt.sign(user.id.toString(), jwtSecret);
+    res.json({
+      fullname: user.fullname,
+      email: user.email,
+      birthday: user.birthday,
+      token
+    });
+  }
   catch (err) {
+    console.log(err);
     return res.status(500).json({
       message: "Something is wrong. Try again"
     })
   }
 };
+
 
 module.exports = {
   registration,

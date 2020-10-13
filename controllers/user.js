@@ -1,4 +1,5 @@
 const db = require('../models/index');
+const getErrorMessage = require("../utils/errorHandler");
 
 const createUser = async (req, res) => {
   try {
@@ -9,11 +10,15 @@ const createUser = async (req, res) => {
       birthday,
       password
     });
-    res.json(user);
+    const userWithoutPassword = {
+      fullname: user.fullname,
+      email: user.email,
+      birthday: user.birthday
+    }
+    res.json(userWithoutPassword);
   } catch (error) {
-    res.json({
-      message: "Something is wrong. Try again"
-    });
+    const errorMessage = getErrorMessage(error);
+    return res.status(errorMessage.code).json({ message: errorMessage.message });
   }
 };
 
@@ -53,14 +58,19 @@ const updateUser = async (req, res) => {
     }, {
       where: {
         id: req.params.id
-      }
+      },
+      returning: true
     });
-    if (result === 1) {
-      const updatedUser = await db.User.findByPk(userId);
-      return res.json(updatedUser);
-    } else {
+    if (!result[1].length) {
       return res.sendStatus(404);
     }
+    const user = result[1][0];
+    const userWithoutPassword = {
+      fullname: user.fullname,
+      email: user.email,
+      birthday: user.birthday
+    }
+    res.json(userWithoutPassword);
   }
   catch (error) {
     return res.status(500);
@@ -74,12 +84,12 @@ const deleteUser = async (req, res) => {
         id: req.params.id
       }
     });
-    if (result === 1) {
-      res.status(200).json({
+    if (result === 0) {
+      return res.sendStatus(404);
+    } else {
+      res.status(204).json({
         message: "User is deleted"
       });
-    } else {
-      res.sendStatus(404);
     }
   }
   catch (error) {
@@ -93,4 +103,4 @@ module.exports = {
   getAllUsers,
   updateUser,
   deleteUser
-}
+};
