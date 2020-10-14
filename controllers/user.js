@@ -1,21 +1,25 @@
 const db = require('../models/index');
 const getErrorMessage = require("../utils/errorHandler");
+const isPasswordValid = require('../utils/isPasswordValid');
 
 const createUser = async (req, res) => {
   try {
     const { fullname, email, birthday, password } = req.body;
-    const user = await db.User.create({
+    if (!isPasswordValid(password)) {
+      return res.status(400).json({
+        message: `Password must be between 3 and 20 characters.
+        Password must not contain spaces.`
+      });
+    }
+    const candidate = await db.User.create({
       fullname,
       email,
       birthday,
       password
     });
-    const userWithoutPassword = {
-      fullname: user.fullname,
-      email: user.email,
-      birthday: user.birthday
-    }
-    res.json(userWithoutPassword);
+    const user = candidate.toJSON();
+    delete user.password;
+    res.json(user);
   } catch (error) {
     const errorMessage = getErrorMessage(error);
     return res.status(errorMessage.code).json({ message: errorMessage.message });
@@ -24,8 +28,10 @@ const createUser = async (req, res) => {
 
 const getUser = async (req, res) => {
   try {
-    const userId = req.params.id;
-    const user = await db.User.findByPk(userId);
+    if(+req.params.id === req.user.id){
+      return res.json(req.user);
+    }
+    const user = await db.User.findByPk(req.params.id);
     if (!user) {
       return res.status(404).json({
         message: "User is not found"
@@ -34,7 +40,7 @@ const getUser = async (req, res) => {
     res.json(user);
   }
   catch (error) {
-    return res.status(500);
+    res.status(500);
   }
 };
 
@@ -43,7 +49,7 @@ const getAllUsers = async (req, res) => {
     const users = await db.User.findAll();
     res.json(users);
   } catch (error) {
-    return res.status(500);
+    res.status(500);
   }
 };
 
@@ -51,6 +57,7 @@ const updateUser = async (req, res) => {
   try {
     const { fullname, email, birthday, password } = req.body;
     const result = await db.User.update({
+      // const [isUpdated, [user]] = await db.User.update({
       fullname,
       email,
       birthday,
@@ -64,13 +71,9 @@ const updateUser = async (req, res) => {
     if (!result[1].length) {
       return res.sendStatus(404);
     }
-    const user = result[1][0];
-    const userWithoutPassword = {
-      fullname: user.fullname,
-      email: user.email,
-      birthday: user.birthday
-    }
-    res.json(userWithoutPassword);
+    const user = result[1][0].toJSON();
+    delete user.password;
+    res.json(user);
   }
   catch (error) {
     return res.status(500);
@@ -86,11 +89,10 @@ const deleteUser = async (req, res) => {
     });
     if (result === 0) {
       return res.sendStatus(404);
-    } else {
-      res.status(204).json({
-        message: "User is deleted"
-      });
     }
+    res.status(204).json({
+      message: "User is deleted"
+    });
   }
   catch (error) {
     return res.status(500);

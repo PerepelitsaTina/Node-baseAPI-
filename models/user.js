@@ -1,7 +1,9 @@
+
 'use strict';
 const {
   Model
 } = require('sequelize');
+const hashPassword = require('../utils/hashPassword');
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -37,18 +39,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE
     },
     password: {
-      validate: {
-        len: {
-          args: [3, 20],
-          msg: "Min password length is 3, max is 20"
-        },
-        notContains: {
-          args: [" "],
-          msg: "Password can't contain spaces"
-        }
-      },
       allowNull: false,
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
+      set(value) {
+        this.setDataValue("password", hashPassword(value));
+      }
     },
     createdAt: {
       allowNull: false,
@@ -62,7 +57,7 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'User',
     defaultScope: {
-      attributes: { exclude: ['password'] },
+      attributes: { exclude: "password" },
     }
   });
   return User;

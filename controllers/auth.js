@@ -1,100 +1,67 @@
 const db = require("../models/index");
 const getErrorMessage = require("../utils/errorHandler");
 const jwt = require("jsonwebtoken");
-const crypto = require("crypto");
-const { jwtSecret } = require("../config/app");
+const config = require("../config/defaultConfig");
+const hashPassword = require("../utils/hashPassword");
+const isPasswordValid = require("../utils/isPasswordValid");
 
 const registration = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await db.User.create({
+    if (!isPasswordValid(password)) {
+      return res.status(400).json({
+        message: `Password must be between 3 and 20 characters.
+        Password must not contain spaces.`
+      });
+    }
+    const candidate = await db.User.create({
       email,
       password
     });
-    const userWithoutPassword = {
-      fullname: user.fullname,
-      email: user.email,
-      birthday: user.birthday
-    }
-    res.json(userWithoutPassword);
+    const user = candidate.toJSON();
+    delete user.password;
+    res.json(user);
   } catch (error) {
-    const errorMessage = getErrorMessage(error);
-    return res.status(errorMessage.code).json({ message: errorMessage.message });
+    const { code, message } = getErrorMessage(error);
+    return res.status(code).json({ message });
   }
 };
-
-// const login = async (req, res) => {
-//   try {
-//     const { email, password } = req.body;
-//     const user = await db.User.findOne({
-//       where: {
-//         email
-//       },
-//       attributes: {
-//         include: ["password"]
-//       }
-//     });
-//     if (!user) {
-//       return res.status(404).json({
-//         message: "This email is not registered"
-//       });
-//     }
-//     if (password !== user.password) {
-//       return res.status(400).json({
-//         message: "Password is wrong"
-//       })
-//     }
-//     const userWithoutPassword = {
-//       fullname: user.fullname,
-//       email: user.email,
-//       birthday: user.birthday
-//     }
-//     res.json(userWithoutPassword);
-//   }
-//   catch (err) {
-//     return res.status(500).json({
-//       message: "Something is wrong. Try again"
-//     })
-//   }
-// };
 
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await db.User.findOne({
+    const candidate = await db.User.findOne({
       where: {
         email
       },
       attributes: {
-        include: ["password"]
+        include: "password"
       }
     });
-    if (!user) {
+    if (!candidate) {
       return res.status(404).json({
         message: "This email is not registered"
       });
     }
-    if (password !== user.password) {
+    if (hashPassword(password) !== candidate.password) {
       return res.status(400).json({
         message: "Password is wrong"
-      })
+      });
     }
-    const token = jwt.sign(user.id.toString(), jwtSecret);
+    const token = jwt.sign({ id: candidate.id }, config.app.jwtSecret, { expiresIn: config.app.expiresIn });
+    const user = candidate.toJSON();
+    delete user.password;
     res.json({
-      fullname: user.fullname,
-      email: user.email,
-      birthday: user.birthday,
+      user,
       token
     });
-  }
-  catch (err) {
-    console.log(err);
+  } catch (error) {
+    console.log(error);
     return res.status(500).json({
       message: "Something is wrong. Try again"
-    })
+    });
   }
 };
-
 
 module.exports = {
   registration,
