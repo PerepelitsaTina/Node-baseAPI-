@@ -7,7 +7,8 @@ const getErrorMessage = (error) => {
   const errorType = _get(error, "errors[0].type");
   if (
     errorType === "Validation error" ||
-    errorType === "notNull Violation"
+    errorType === "notNull Violation" ||
+    errorType === "unique violation"
   ) {
     code = 400;
     message = error.message;

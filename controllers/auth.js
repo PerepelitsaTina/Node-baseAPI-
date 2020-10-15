@@ -1,18 +1,15 @@
 const db = require("../models/index");
 const getErrorMessage = require("../utils/errorHandler");
-const jwt = require("jsonwebtoken");
-const config = require("../config");
 const hashPassword = require("../utils/hashPassword");
 const isPasswordValid = require("../utils/isPasswordValid");
+const { createToken } = require("../utils/jwt")
 
 const registration = async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!isPasswordValid(password)) {
-      return res.status(400).json({
-        message: `Password must be between 3 and 20 characters.
-        Password must not contain spaces.`
-      });
+    const isValid = isPasswordValid(password);
+    if (isValid !== true) {
+      return res.status(400).json({ message: isValid })
     }
     let user = await db.User.create({
       email,
@@ -49,7 +46,7 @@ const login = async (req, res) => {
         message: "Password is wrong"
       });
     }
-    const token = jwt.sign({ id: user.id }, config.jwt.jwtSecret, { expiresIn: config.jwt.expiresIn });
+    const token = createToken(user.id);
     user = user.toJSON();
     delete user.password;
     res.json({
@@ -64,7 +61,16 @@ const login = async (req, res) => {
   }
 };
 
+const me = (req, res) => {
+  try {
+    res.json(req.user);
+  } catch (error) {
+    return res.status(500);
+  }
+};
+
 module.exports = {
   registration,
-  login
+  login,
+  me
 }

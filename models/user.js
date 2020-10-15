@@ -25,7 +25,9 @@ module.exports = (sequelize, DataTypes) => {
         }
       },
       allowNull: false,
-      unique: true,
+      unique: {
+        msg: "This email is already registered"
+      },
       type: DataTypes.STRING
     },
     birthday: {

@@ -2,16 +2,16 @@ const isPasswordValid = (password) => {
   if (!password) {
     return;
   }
-  if (password.length > 3) {
+  if (password.length < 3) {
     return "Password must be longer than 2";
   }
-  const minLength = password.length > 3;
-  const maxLength = password.length < 20;
-  const noSpaces = !password.includes(" ");
-  if (minLength && maxLength && noSpaces) {
-    return true;
+  if (password.length > 20) {
+    return "Password must be shorter than 21";
   }
-  return false;
+  if (password.includes(" ")) {
+    return "Password must not contain spaces"
+  }
+  return true;
 };
 
 module.exports = isPasswordValid;
