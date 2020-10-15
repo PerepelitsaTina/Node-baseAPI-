@@ -3,12 +3,12 @@
     "port": 4000,
     "jwt": {
       "jwtSecret": "put your secret here",
-      "hashSecret": "put your secret here"
+      "expiresIn": "20m"
     },
     "hash": {
       "hashType": "md5",
-      "digestType": "hex",
-      "expiresIn": "20m"
+      "hashSecret": "put your secret here",
+      "digestType": "hex"
     }
   }
 }

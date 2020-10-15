@@ -1,4 +1,3 @@
-
 'use strict';
 const {
   Model
@@ -16,12 +15,6 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   User.init({
-    id: {
-      allowNull: false,
-      autoIncrement: true,
-      primaryKey: true,
-      type: DataTypes.INTEGER
-    },
     fullname: {
       type: DataTypes.STRING
     },
@@ -44,20 +37,14 @@ module.exports = (sequelize, DataTypes) => {
       set(value) {
         this.setDataValue("password", hashPassword(value));
       }
-    },
-    createdAt: {
-      allowNull: false,
-      type: DataTypes.DATE
-    },
-    updatedAt: {
-      allowNull: false,
-      type: DataTypes.DATE
     }
   }, {
     sequelize,
     modelName: 'User',
     defaultScope: {
-      attributes: { exclude: "password" },
+      attributes: {
+        exclude: "password"
+      },
     }
   });
   return User;
