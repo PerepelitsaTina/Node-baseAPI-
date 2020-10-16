@@ -1,5 +1,15 @@
+const _defaultsDeep = require('lodash/defaultsDeep');
 const defaultConfig = require('./defaultConfig.json');
 
 const envType = process.env.NODE_ENV || 'development';
 
-module.exports = defaultConfig[envType];
+let localConfig = {};
+try {
+  localConfig = require('./localConfig.json');
+} catch (err) {
+  console.warn("There is no localConfig.json file");
+}
+
+const config = _defaultsDeep(localConfig, defaultConfig);
+
+module.exports = config[envType];

@@ -1,6 +1,5 @@
 const db = require('../models/index');
 const getErrorMessage = require("../utils/errorHandler");
-const isPasswordValid = require('../utils/isPasswordValid');
 
 const createUser = async (req, res) => {
   try {
@@ -10,13 +9,7 @@ const createUser = async (req, res) => {
       birthday,
       password
     } = req.body;
-
-    if (!isPasswordValid(password)) {
-      return res.status(400).json({
-        message: `Password must be between 3 and 20 characters.
-        Password must not contain spaces.`
-      });
-    }
+    
     let user = await db.User.create({
       fullname,
       email,

@@ -2,13 +2,15 @@ const express = require("express");
 const router = express.Router();
 const user = require("../controllers/user");
 const isAuth = require("../middleware/isAuth");
+const isValid = require("../middleware/isValid");
+const schemes = require("../utils/schemes");
 
 router.use(isAuth);
 
-router.post("/", user.createUser);
+router.post("/", isValid({shape: schemes.userBodyValidator}), user.createUser);
 router.get("/list", user.getAllUsers);
 router.get("/:id", user.getUser);
-router.patch("/:id", user.updateUser);
+router.patch("/:id", isValid({shape: schemes.loginValidator}), user.updateUser);
 router.delete("/:id", user.deleteUser);
 
 module.exports = router;

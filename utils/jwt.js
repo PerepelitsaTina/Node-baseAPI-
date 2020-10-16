@@ -21,4 +21,4 @@ const checkToken = (authHeader) => {
 module.exports = {
   createToken,
   checkToken
-}
+};

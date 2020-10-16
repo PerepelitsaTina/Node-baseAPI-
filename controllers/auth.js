@@ -1,16 +1,15 @@
 const db = require("../models/index");
 const getErrorMessage = require("../utils/errorHandler");
 const hashPassword = require("../utils/hashPassword");
-const isPasswordValid = require("../utils/isPasswordValid");
 const { createToken } = require("../utils/jwt")
+const {
+  ReasonPhrases,
+  StatusCodes,
+} = require("http-status-codes");
 
 const registration = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const isValid = isPasswordValid(password);
-    if (isValid !== true) {
-      return res.status(400).json({ message: isValid })
-    }
     let user = await db.User.create({
       email,
       password
@@ -37,9 +36,10 @@ const login = async (req, res) => {
       }
     });
     if (!user) {
-      return res.status(404).json({
-        message: "This email is not registered"
-      });
+      throw {
+        status: StatusCodes.NOT_FOUND, 
+        message: ReasonPhrases.NOT_FOUND
+      };
     }
     if (hashPassword(password) !== user.password) {
       return res.status(400).json({

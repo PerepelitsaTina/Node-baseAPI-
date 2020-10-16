@@ -1,26 +1,30 @@
 
 const _get = require("lodash/get");
 
-const getErrorMessage = (error) => {
-  let code;
-  let message;
-  const errorType = _get(error, "errors[0].type");
-  if (
-    errorType === "Validation error" ||
-    errorType === "notNull Violation" ||
-    errorType === "unique violation"
-  ) {
-    code = 400;
-    message = error.message;
-  } else {
-    code = 500;
-    message = "Something is wrong";
-  }
+const errorHandler = (err, req, res, next) => {
+  
+}
 
-  return {
-    code,
-    message
-  }
-};
+// const getErrorMessage = (error) => {
+//   let code;
+//   let message;
+//   const errorType = _get(error, "errors[0].type");
+//   if (
+//     errorType === "Validation error" ||
+//     errorType === "notNull Violation" ||
+//     errorType === "unique violation"
+//   ) {
+//     code = 400;
+//     message = error.message;
+//   } else {
+//     code = 500;
+//     message = "Something is wrong";
+//   }
 
-module.exports = getErrorMessage;
+//   return {
+//     code,
+//     message
+//   }
+// };
+
+// module.exports = getErrorMessage;
