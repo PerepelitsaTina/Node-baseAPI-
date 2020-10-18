@@ -1,7 +1,7 @@
 const db = require('../models/index');
-const getErrorMessage = require("../utils/errorHandler");
+const { StatusCodes } = require("http-status-codes");
 
-const createUser = async (req, res) => {
+const createUser = async (req, res, next) => {
   try {
     const {
       fullname,
@@ -21,34 +21,34 @@ const createUser = async (req, res) => {
     delete user.password;
     res.json(user);
   } catch (error) {
-    const errorMessage = getErrorMessage(error);
-    return res.status(errorMessage.code).json({
-      message: errorMessage.message
-    });
+    next(error);
   }
 };
 
-const getUser = async (req, res) => {
+const getUser = async (req, res, next) => {
   try {
     if (+req.params.id === req.user.id) {
       return res.json(req.user);
     }
-    return res.status(404);
+    throw {
+      status: StatusCodes.NOT_FOUND,
+      message: "User is not found"
+    };
   } catch (error) {
-    res.status(500);
+    next(error);
   }
 };
 
-const getAllUsers = async (req, res) => {
+const getAllUsers = async (req, res, next) => {
   try {
     const users = await db.User.findAll();
     res.json(users);
   } catch (error) {
-    res.status(500);
+    next(error);
   }
 };
 
-const updateUser = async (req, res) => {
+const updateUser = async (req, res, next) => {
   try {
     const {
       fullname,
@@ -70,17 +70,20 @@ const updateUser = async (req, res) => {
     });
 
     if (!isUpdated) {
-      return res.sendStatus(404);
+      throw {
+        status: StatusCodes.NOT_FOUND,
+        message: "User is not found"
+      };
     }
     user = user.toJSON();
     delete user.password;
     res.json(user);
   } catch (error) {
-    return res.status(500);
+    next(error);
   }
 };
 
-const deleteUser = async (req, res) => {
+const deleteUser = async (req, res, next) => {
   try {
     const result = await db.User.destroy({
       where: {
@@ -88,11 +91,14 @@ const deleteUser = async (req, res) => {
       }
     });
     if (result === 0) {
-      return res.sendStatus(404);
+      throw {
+        status: StatusCodes.NOT_FOUND,
+        message: "User is not found"
+      };
     }
-    res.status(204);
+    res.status(StatusCodes.NO_CONTENT);
   } catch (error) {
-    return res.status(500);
+    next(error);
   }
 };
 

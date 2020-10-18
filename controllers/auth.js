@@ -1,13 +1,9 @@
 const db = require("../models/index");
-const getErrorMessage = require("../utils/errorHandler");
 const hashPassword = require("../utils/hashPassword");
 const { createToken } = require("../utils/jwt")
-const {
-  ReasonPhrases,
-  StatusCodes,
-} = require("http-status-codes");
+const { StatusCodes } = require("http-status-codes");
 
-const registration = async (req, res) => {
+const registration = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     let user = await db.User.create({
@@ -18,13 +14,11 @@ const registration = async (req, res) => {
     delete user.password;
     res.json(user);
   } catch (error) {
-    console.log(error);
-    const { code, message } = getErrorMessage(error);
-    return res.status(code).json({ message });
+    next(error);
   }
 };
 
-const login = async (req, res) => {
+const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     let user = await db.User.findOne({
@@ -38,13 +32,15 @@ const login = async (req, res) => {
     if (!user) {
       throw {
         status: StatusCodes.NOT_FOUND, 
-        message: ReasonPhrases.NOT_FOUND
+        message: "User is not found"
       };
     }
     if (hashPassword(password) !== user.password) {
-      return res.status(400).json({
+      throw {
+        status: StatusCodes.BAD_REQUEST, 
         message: "Password is wrong"
-      });
+      };
+
     }
     const token = createToken(user.id);
     user = user.toJSON();
@@ -54,18 +50,15 @@ const login = async (req, res) => {
       token
     });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      message: "Something is wrong. Try again"
-    });
+    next(error);
   }
 };
 
-const me = (req, res) => {
+const me = (req, res, next) => {
   try {
     res.json(req.user);
   } catch (error) {
-    return res.status(500);
+    next(error);
   }
 };
 
