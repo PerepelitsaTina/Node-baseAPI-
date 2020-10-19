@@ -9,19 +9,23 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       email: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        unique: true
       },
       password: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false
       },
       avatar: {
         type: Sequelize.STRING
       },
       role: {
-        type: Sequelize.ENUM
+        type: Sequelize.ENUM("admin", "user"),
+        defaultValue: "user"
       },
       status: {
-        type: Sequelize.ENUM
+        type: Sequelize.ENUM("active", "disabled"),
+        defaultValue: "active"
       },
       createdAt: {
         allowNull: false,

@@ -8,8 +8,14 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      author_id: {
-        type: Sequelize.INTEGER
+      authorId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Users',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
       },
       title: {
         type: Sequelize.STRING
@@ -18,7 +24,7 @@ module.exports = {
         type: Sequelize.TEXT
       },
       images: {
-        type: Sequelize.ARRAY
+        type: Sequelize.ARRAY(Sequelize.TEXT)
       },
       createdAt: {
         allowNull: false,

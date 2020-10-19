@@ -1,7 +1,8 @@
+const { StatusCodes } = require("http-status-codes");
+
 const db = require("../models/index");
 const hashPassword = require("../utils/hashPassword");
 const { createToken } = require("../utils/jwt")
-const { StatusCodes } = require("http-status-codes");
 
 const registration = async (req, res, next) => {
   try {
