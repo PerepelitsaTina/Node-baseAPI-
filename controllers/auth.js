@@ -11,9 +11,13 @@ const registration = async (req, res, next) => {
       email,
       password
     });
+    const token = createToken(user.id);
     user = user.toJSON();
     delete user.password;
-    res.json(user);
+    res.json({
+      user,
+      token
+    });
   } catch (error) {
     next(error);
   }

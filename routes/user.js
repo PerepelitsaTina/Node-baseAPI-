@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+
 const user = require("../controllers/user");
 const isAuth = require("../middleware/isAuth");
 const isValid = require("../middleware/isValid");

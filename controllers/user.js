@@ -4,19 +4,19 @@ const { StatusCodes } = require("http-status-codes");
 const createUser = async (req, res, next) => {
   try {
     const {
-      fullname,
       email,
-      birthday,
-      password
+      password,
+      role,
+      status
     } = req.body;
-    
+
     let user = await db.User.create({
-      fullname,
       email,
-      birthday,
-      password
+      password,
+      role,
+      status
     });
-    
+
     user = user.toJSON();
     delete user.password;
     res.json(user);
@@ -51,17 +51,17 @@ const getAllUsers = async (req, res, next) => {
 const updateUser = async (req, res, next) => {
   try {
     const {
-      fullname,
       email,
-      birthday,
-      password
+      password,
+      role,
+      status
     } = req.body;
 
     let [isUpdated, [user]] = await db.User.update({
-      fullname,
       email,
-      birthday,
-      password
+      password,
+      role,
+      status
     }, {
       where: {
         id: req.params.id
