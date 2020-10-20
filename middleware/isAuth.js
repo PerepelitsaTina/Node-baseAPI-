@@ -5,6 +5,7 @@ const { checkToken } = require("../utils/jwt");
 module.exports = async (req, res, next) => {
   try {
     const decoded = checkToken(req.headers.authorization);
+    console.log(decoded);
     const user = await db.User.findByPk(decoded.id);
     if (!user) {
       return res.status(404);
