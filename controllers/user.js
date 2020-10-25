@@ -27,8 +27,11 @@ const createUser = async (req, res, next) => {
 
 const getUser = async (req, res, next) => {
   try {
-    if (+req.params.id === req.user.id) {
-      return res.json(req.user);
+    let user = await db.User.findByPk(req.params.id);
+    if (user) {
+      user = user.toJSON();
+      delete user.password;
+      return res.json(user);
     }
     throw {
       status: StatusCodes.NOT_FOUND,
@@ -49,6 +52,8 @@ const getAllUsers = async (req, res, next) => {
 };
 
 const updateUser = async (req, res, next) => {
+  console.log(req.body);
+  console.log(req.params.id);
   try {
     const {
       email,
