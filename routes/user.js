@@ -8,10 +8,10 @@ const schemes = require("../utils/schemes");
 
 router.use(isAuth);
 
-router.post("/", isValid({shape: schemes.userBodyValidator}), user.createUser);
+router.post("/", isValid({shape: schemes.registerValidator}), user.createUser);
 router.get("/list", user.getAllUsers);
 router.get("/:id", user.getUser);
-router.patch("/:id", isValid({shape: schemes.loginValidator}), user.updateUser);
+router.patch("/:id", isValid({shape: schemes.updateValidator}), user.updateUser);
 router.delete("/:id", user.deleteUser);
 
 module.exports = router;

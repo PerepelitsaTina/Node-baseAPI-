@@ -64,7 +64,6 @@ const me = (req, res, next) => {
   try {
     res.json(req.user);
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };

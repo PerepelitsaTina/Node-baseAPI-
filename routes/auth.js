@@ -6,7 +6,7 @@ const schemes = require("../utils/schemes");
 
 const router = express.Router();
 
-router.post("/register", isValid({shape: schemes.userBodyValidator}), auth.registration);
+router.post("/register", isValid({shape: schemes.registerValidator}), auth.registration);
 router.post("/login", isValid({shape: schemes.loginValidator}), auth.login);
 router.get("/me", isAuth, auth.me);
 

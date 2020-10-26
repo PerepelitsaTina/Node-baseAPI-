@@ -52,22 +52,24 @@ const getAllUsers = async (req, res, next) => {
 };
 
 const updateUser = async (req, res, next) => {
-  console.log(req.body);
-  console.log(req.params.id);
+  console.log(req);
   try {
     const {
       email,
-      password,
       role,
       status
     } = req.body;
-
-    let [isUpdated, [user]] = await db.User.update({
+    let updatedUser = {
       email,
-      password,
       role,
       status
-    }, {
+    };
+
+    if (req.body.password) {
+      updatedUser.password = req.body.password;
+    }
+
+    let [isUpdated, [user]] = await db.User.update(updatedUser, {
       where: {
         id: req.params.id
       },
@@ -84,6 +86,7 @@ const updateUser = async (req, res, next) => {
     delete user.password;
     res.json(user);
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };
